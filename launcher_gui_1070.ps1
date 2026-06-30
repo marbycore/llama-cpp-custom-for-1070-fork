@@ -140,8 +140,9 @@ function New-Setting {
     return $cb
 }
 
-# Contextos reducidos y optimizados para evitar OOM en 8GB de VRAM
-$cCtx = New-Setting "Contexto (Tokens)" 15 @("2048 (2K)", "4096 (4K)", "8192 (8K)", "16384 (16K)") 1 "Contexto del KV Cache"
+# Contextos optimizados y ampliados hasta 65K para Pascal
+$cCtx = New-Setting "Contexto (Tokens)" 15 @("2048 (2K)", "4096 (4K)", "8192 (8K)", "16384 (16K)", "32768 (32K)", "65536 (65K)") 1 "Contexto del KV Cache. Advertencia: Valores >16K consumen mucha VRAM de la 1070"
+
 $cGpu = New-Setting "GPU Layers (-ngl)" 240 @("99 - Todo en GPU", "40 - Parcial (8B)", "25 - Parcial (13B)") 0 "Capas mapeadas a VRAM"
 $cPar = New-Setting "Parallel Slots (-np)" 465 @("1 - Solo Yo", "2 - Con Hermes (Slots)") 0 "Sesiones simultaneas"
 $cBat = New-Setting "uBatch/Batch Size" 690 @("Default (512)", "256 - Bajo en VRAM", "1024 - Rapido") 0 "Batch size para Pascal"
