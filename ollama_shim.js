@@ -6,13 +6,14 @@ const PROXY_PORT = 11434;
 const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
 const ENABLE_TAVILY = process.argv[2] === "1";
 
-console.log(`[Elite Blackwell Shim]`);
+console.log(`[Elite Pascal Shim]`);
 console.log(`- Puerto: ${PROXY_PORT} -> ${TARGET_PORT}`);
 console.log(`- Tavily Status: ${ENABLE_TAVILY ? "ACTIVADO (Agentic)" : "DESACTIVADO (Directo)"}`);
 
 const fs = require('fs');
-const LOG_FILE = 'C:\\data\\llama-cpp-custom\\shim_debug.log';
+const LOG_FILE = 'C:\\data\\llama-ccp-1070\\shim_debug.log';
 function logToFile(msg) { fs.appendFileSync(LOG_FILE, `[${new Date().toISOString()}] ${msg}\n`); }
+
 
 async function searchTavily(query) {
     if (!TAVILY_API_KEY || !query) {
@@ -81,13 +82,14 @@ const server = http.createServer((req, res) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             models: [{
-                name: "Blackwell-RTX5080",
-                model: "Blackwell-RTX5080",
+                name: "Pascal-GTX1070",
+                model: "Pascal-GTX1070",
                 details: { family: "llama", format: "gguf" }
             }]
         }));
         return;
     }
+
 
     // Traduccion de Rutas
     if (url === '/api/chat') targetPath = '/v1/chat/completions';
@@ -112,7 +114,7 @@ const server = http.createServer((req, res) => {
                         const evidence = await searchTavily(userQuery);
                         if (evidence) {
                             jsonBody.messages[jsonBody.messages.length - 1].content =
-                                `### CONTEXTO DE INTERNET (SISTEMA BLACKWELL) ###\n${evidence}\n\n### INSTRUCCIÓN ###\nResponde a la siguiente pregunta usando los datos del contexto superior si son útiles.\n\nPregunta: ${userQuery}`;
+                                `### CONTEXTO DE INTERNET (SISTEMA PASCAL) ###\n${evidence}\n\n### INSTRUCCIÓN ###\nResponde a la siguiente pregunta usando los datos del contexto superior si son útiles.\n\nPregunta: ${userQuery}`;
                             updatedBody = Buffer.from(JSON.stringify(jsonBody));
                             console.log("[Shim] Contexto de internet inyectado con éxito.");
                         }
@@ -162,7 +164,7 @@ const server = http.createServer((req, res) => {
                             const content = (choices[0] && choices[0].delta && choices[0].delta.content) || "";
                             if (content) {
                                 res.write(JSON.stringify({
-                                    model: "Blackwell-RTX5080",
+                                    model: "Pascal-GTX1070",
                                     message: { role: "assistant", content: content },
                                     done: false
                                 }) + '\n');
@@ -180,8 +182,9 @@ const server = http.createServer((req, res) => {
         proxyReq.on('error', (e) => {
             console.log("[Proxy Error] " + e.message);
             res.writeHead(502);
-            res.end(JSON.stringify({ error: "Motor Blackwell no disponible", details: e.message }));
+            res.end(JSON.stringify({ error: "Motor Pascal no disponible", details: e.message }));
         });
+
 
         proxyReq.write(updatedBody);
         proxyReq.end();
