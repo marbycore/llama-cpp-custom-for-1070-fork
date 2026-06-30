@@ -1,31 +1,57 @@
-# Llama.cpp GTX 1070 Pascal — Distribución Portable
+# Llama.cpp GTX 1070 Pascal — Portable Distribution / Distribución Portable
 
-Este paquete **ya viene con el motor precompilado** (`llama-server.exe` + DLLs CUDA 12.4).
-No necesitas compilar nada para comenzar a usarlo en cualquier PC con GTX 1070.
+[English](#english) | [Español](#español)
 
 ---
 
-## Inicio Rápido (3 pasos)
+## English
 
-1. **Descarga un modelo GGUF** recomendado (ver sección abajo) y ponlo en una carpeta accesible.
+This package **comes precompiled** (`llama-server.exe` + CUDA 12.4 DLLs). 
+You do not need to install CUDA Toolkit or compile anything to run it on any PC containing a GTX 1070.
+
+### ⚡ Quick Start (3 Steps)
+1. **Download a recommended GGUF model** (see list below) and place it in an accessible folder.
+2. **Double-click** `Llama-Server_GTX1070.bat`.
+3. Select your model, adjust the context length, and click **Launch**.
+
+The server will listen at `http://localhost:5050` and act as an Ollama server on port `11434`.
+
+### ⚙️ Optimization Details
+- **Native MMVQ Kernels (sm_61):** Built directly from the official llama.cpp repo with explicit Pascal architecture support. Utilizes the native hardware `__dp4a` dot-product instruction.
+- **Deactivated Flash Attention:** Deactivated by default on Pascal architectures to prevent stability bottlenecks and memory faults.
+- **Tuned Context Limits (8GB VRAM):** Default profiles are set to 4K/8K to avoid Out-Of-Memory (OOM) crashes under GDDR5 limits. 
+- **Ollama Shim & Tavily Enabled:** Comes out-of-the-box with network search integrations.
+
+### 🤖 Recommended GGUF Models (Q4_K_M)
+| Model | VRAM size | Estimated speed |
+|--------|-------------|-------------------|
+| Llama-3-8B-Instruct Q4_K_M | ~4.8 GB | 18-28 t/s |
+| Qwen2.5-7B-Instruct Q4_K_M | ~4.7 GB | 20-30 t/s |
+| DeepSeek-Coder-6.7B Q4_K_M | ~4.4 GB | 22-32 t/s |
+| Phi-3-mini-4k Q4_K_M | ~2.3 GB | 35-50 t/s |
+
+*Avoid GGUF models >12B as they will force Unified Memory paging, bringing speed down.*
+
+---
+
+## Español
+
+Este paquete **ya viene con el motor precompilado** (`llama-server.exe` + DLLs CUDA 12.4).
+No necesitas compilar nada ni instalar CUDA Toolkit para comenzar a usarlo en cualquier PC con GTX 1070.
+
+### ⚡ Inicio Rápido (3 pasos)
+1. **Descarga un modelo GGUF** recomendado (ver sección abajo) y colócalo en una carpeta accesible.
 2. **Haz doble clic** en `Llama-Server_GTX1070.bat`.
 3. Selecciona el modelo, ajusta el contexto y haz clic en **Iniciar**.
 
-El servidor queda escuchando en `http://localhost:5050` y puede actuar como un servidor Ollama en el puerto `11434`.
+El servidor queda escuchando en `http://localhost:5050` y emula a Ollama en el puerto `11434`.
 
----
+### ⚙️ Optimizaciones Clave
+- **Kernels MMVQ nativos (sm_61):** Generados para Pascal (GTX 1070) usando la instrucción `__dp4a` nativa de hardware.
+- **Flash Attention Inactivo:** Desactivado por defecto en la GTX 1070 para garantizar máxima estabilidad.
+- **Perfiles de Contexto Ajustados (8GB VRAM):** Por defecto a 4K/8K para evitar Out-Of-Memory (OOM).
 
-## Optimizaciones Clave Incorporadas
-
-- **Kernels MMVQ nativos (sm_61):** Generados a partir del build oficial de llama.cpp con soporte explícito para Pascal (GTX 1070). Usan la instrucción `__dp4a` del hardware.
-- **Flash Attention Inactivo:** Pascal no posee soporte de hardware óptimo. El lanzador lo desactiva por defecto para máxima estabilidad.
-- **Perfiles de Contexto Ajustados (8GB VRAM):** Los perfiles predeterminados son 4K/8K para evitar OOM. No excedas 12K a menos que el modelo sea pequeño (<=7B Q4).
-- **Motor b9843 oficial** con soporte integrado de Ollama Shim y búsqueda agéntica Tavily.
-
----
-
-## Modelos Recomendados (GGUF Q4_K_M)
-
+### 🤖 Modelos Recomendados (GGUF Q4_K_M)
 | Modelo | Tamaño VRAM | Velocidad estimada |
 |--------|-------------|-------------------|
 | Llama-3-8B-Instruct Q4_K_M | ~4.8 GB | 18-28 t/s |
@@ -33,44 +59,21 @@ El servidor queda escuchando en `http://localhost:5050` y puede actuar como un s
 | DeepSeek-Coder-6.7B Q4_K_M | ~4.4 GB | 22-32 t/s |
 | Phi-3-mini-4k Q4_K_M | ~2.3 GB | 35-50 t/s |
 
-*Evita modelos de >12B parámetros completos. Con Q3_K_S puedes cargar hasta ~12B si quieres sacrificar calidad.*
-
 ---
 
-## Estructura del Paquete
-
+## Package Directory / Estructura del Paquete
 ```
 dist_1070/
-├── llama-server.exe          ← Motor principal de inferencia CUDA 12
-├── ggml-cuda.dll             ← Kernels CUDA (Pascal-optimizados)
-├── cublas64_12.dll           ← Librerías CUDA Runtime
-│   ... (otras DLLs de CUDA 12.4)
-├── Llama-Server_GTX1070.bat  ← Lanzador gráfico interactivo
-├── launcher_gui_1070.ps1     ← Panel GUI PowerShell (modo azul)
-├── ollama_shim.js            ← Puente de compatibilidad Ollama
-├── sync_hermes.ps1           ← Sincronizador del agente Hermes
-├── descargar_binario_oficial_1070.ps1 ← Actualizar binarios desde GitHub
-└── compilar_para_1070.ps1    ← Compilar desde fuente (requiere VS + CUDA 12)
+├── llama-server.exe          ← CUDA 12 Inference Engine
+├── ggml-cuda.dll             ← Pascal-optimized CUDA kernels
+├── cublas64_12.dll            ← CUDA 12.4 Runtime Libraries
+├── Llama-Server_GTX1070.bat  ← Batch Interactive launcher
+├── launcher_gui_1070.ps1     ← PowerShell GUI Orchestrator
+├── ollama_shim.js            ← Connection compatibility shim
+├── sync_hermes.ps1           ← Local Hermes Agent Synchronizer
+├── descargar_binario_oficial_1070.ps1 ← Auto-updater from GitHub release
+└── compilar_para_1070.ps1    ← Source compiler (needs VS + CUDA 12)
 ```
-
----
-
-## Actualizar el Motor
-
-Para obtener el motor más reciente desde GitHub (sin compilar):
-
-```powershell
-.\descargar_binario_oficial_1070.ps1
-```
-
-Para compilar desde fuente (requiere Visual Studio 2022+ y CUDA Toolkit 12.x):
-
-```powershell
-.\compilar_para_1070.ps1
-```
-
-> **Nota:** La compilación desde fuente no es compatible con CUDA 13.x (Visual Studio 2026).
-> En ese caso el script de descarga automática es la opción preferida.
 
 ---
 
