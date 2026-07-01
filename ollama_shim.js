@@ -77,14 +77,43 @@ const server = http.createServer((req, res) => {
     let targetPath = url;
     console.log(`[Proxy] ${req.method} ${url}`);
 
-    // Handshake de Descubrimiento
+    // Handshake de Descubrimiento — identidad Pascal GTX1070
     if (url === '/api/tags' || url === '/api/models' || url === '/v1/models') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
             models: [{
                 name: "Pascal-GTX1070",
                 model: "Pascal-GTX1070",
-                details: { family: "llama", format: "gguf" }
+                modified_at: new Date().toISOString(),
+                size: 0,
+                details: { family: "llama", format: "gguf", parameter_size: "7B", quantization_level: "Q4_K_M" }
+            }]
+        }));
+        return;
+    }
+
+    // Versión del sistema — Off Grid usa esto para mostrar el nombre del server
+    if (url === '/api/version') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            version: "llama.cpp GTX1070 Pascal Edition (CUDA 12.4 / sm_61)",
+            gpu: "NVIDIA GTX 1070",
+            arch: "Pascal sm_61",
+            vram: "8GB GDDR5"
+        }));
+        return;
+    }
+
+    // Estado activo del modelo — Off Grid usa esto para mostrar el modelo cargado
+    if (url === '/api/ps') {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({
+            models: [{
+                name: "Pascal-GTX1070",
+                model: "Pascal-GTX1070",
+                size: 0,
+                size_vram: 4800000000,
+                details: { family: "llama", format: "gguf", parameter_size: "7B", quantization_level: "Q4_K_M" }
             }]
         }));
         return;
